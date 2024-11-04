@@ -9,6 +9,12 @@ of a method designed to access values within nested dictionaries.
 from parameterized import parameterized
 from utils import access_nested_map
 import unittest
+from typing import (
+    Mapping,
+    Sequence,
+    Any,
+    Dict,
+)
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -22,6 +28,10 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": {"b": 2}}, ("a",), {"b": 2}),
         ({"a": {"b": 2}}, ("a", "b"), 2),
         ])
-    def test_accesss_nested_map(self, nested_map, path, expected):
+    def test_accesss_nested_map(
+            self, nested_map: Mapping,
+            path: Sequence,
+            expected: Any
+            ):
         """This method tests the functionality of a specific method"""
         self.assertEqual(access_nested_map(nested_map, path), expected)
