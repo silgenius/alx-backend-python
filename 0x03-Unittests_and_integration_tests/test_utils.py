@@ -13,7 +13,6 @@ from typing import (
     Mapping,
     Sequence,
     Any,
-    Dict,
 )
 
 
@@ -35,3 +34,17 @@ class TestAccessNestedMap(unittest.TestCase):
             ):
         """This method tests the functionality of a specific method"""
         self.assertEqual(access_nested_map(nested_map, path), expected)
+
+    @parameterized.expand([
+        ({}, ("a",), KeyError),
+        ({"a": 1}, ("a", "b"), KeyError),
+        ])
+    def test_access_nested_map_exception(
+            self, nested_map: Mapping,
+            path: Sequence,
+            error_type: KeyError
+            ):
+        """This method is designed to test the error-handling
+        behavior of the nested map access method."""
+        with self.assertRaises(error_type):
+            access_nested_map(nested_map, path)
