@@ -7,16 +7,22 @@ of a method designed to access values within nested dictionaries.
 
 
 from parameterized import parameterized
-from utils import access_nested_map
+from utils import (
+    access_nested_map,
+    get_json,
+    memoize,
+)
 import unittest
 from typing import (
     Mapping,
     Sequence,
     Any,
 )
-from unittest.mock import patch, Mock
+from unittest.mock import (
+    patch,
+    Mock,
+)
 import requests
-from utils import get_json
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -77,3 +83,35 @@ class TestGetJson(unittest.TestCase):
 
             mock_request.assert_called_once_with(test_url)
             self.assertEqual(result, payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """
+    This class serers to to validate the behavior of the memoization
+    functionality, ensuring that repeated calls to a function with
+    the same arguments return cached results instead of recomputing 
+    the output.
+    """
+
+    def test_memoize(self):
+        """
+        This method tests the memoization feature to verify that
+        it correctly caches results of function calls
+        """
+        class TestClass:
+            
+            def a_method(self):
+                return 42
+            
+            @memoize
+            def a_property(self):
+                return self.a_method()
+
+        with patch.object(TestClass, 'a_method', return_value=42) as mock_a_method:
+            test_obj = TestClass()
+            result1 = test_obj.a_property
+            result2 = test_obj.a_property
+            
+            mock_a_method.assert_called_once()
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
