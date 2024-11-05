@@ -89,7 +89,7 @@ class TestMemoize(unittest.TestCase):
     """
     This class serers to to validate the behavior of the memoization
     functionality, ensuring that repeated calls to a function with
-    the same arguments return cached results instead of recomputing 
+    the same arguments return cached results instead of recomputing
     the output.
     """
 
@@ -98,20 +98,24 @@ class TestMemoize(unittest.TestCase):
         This method tests the memoization feature to verify that
         it correctly caches results of function calls
         """
+
         class TestClass:
-            
             def a_method(self):
                 return 42
-            
+
             @memoize
             def a_property(self):
                 return self.a_method()
 
-        with patch.object(TestClass, 'a_method', return_value=42) as mock_a_method:
+        with patch.object(
+                TestClass,
+                'a_method',
+                return_value=42
+                ) as mock_a_method:
             test_obj = TestClass()
             result1 = test_obj.a_property
             result2 = test_obj.a_property
-            
+
             mock_a_method.assert_called_once()
             self.assertEqual(result1, 42)
             self.assertEqual(result2, 42)
