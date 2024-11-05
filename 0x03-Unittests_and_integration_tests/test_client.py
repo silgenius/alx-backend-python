@@ -16,7 +16,7 @@ from unittest.mock import (
 from typing import Dict
 
 
-class TestiGithubOrgClient(unittest.TestCase):
+class TestGithubOrgClient(unittest.TestCase):
     """
     contains the test methods specifically designed to
     validate the functionality of the GithubOrgClient class
