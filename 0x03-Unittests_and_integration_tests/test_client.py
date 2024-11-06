@@ -15,6 +15,7 @@ from unittest.mock import (
     PropertyMock
 )
 from typing import Dict
+import client
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -61,3 +62,28 @@ class TestGithubOrgClient(unittest.TestCase):
             client = GithubOrgClient(org_name)
             result = client._public_repos_url
             self.assertEqual(result, payload)
+
+    @parameterized.expand([
+        ('google', {'datas': ['data1', 'data2']}),  # Mock response for google
+        ('abc', {'datas': ['data3', 'data']}),    # Mock response for abc
+    ])
+    @patch('client.get_json')
+    def test_public_repos(self, org_name, payload, mock_get_json):
+        mock_get_json.return_value = payload
+        url = f'https://api.github.com/orgs/{org_name}'
+
+        with patch.object(
+                GithubOrgClient,
+                '_public_repos_url',
+                new_callable=PropertyMock
+                ) as mock_public_repos_url:
+
+            mock_public_repos_url.return_value = url
+            result = client.get_json(url)
+            github_client = GithubOrgClient(org_name)
+            github_client = github_client._public_repos_url
+
+            self.assertEqual(github_client, url)
+            self.assertEqual(payload, result)
+            mock_get_json.assert_called_once()
+            mock_public_repos_url.assert_called_once()
