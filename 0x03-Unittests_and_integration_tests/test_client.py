@@ -12,6 +12,7 @@ from unittest.mock import (
     patch,
     Mock,
     MagicMock,
+    PropertyMock
 )
 from typing import Dict
 
@@ -42,3 +43,21 @@ class TestGithubOrgClient(unittest.TestCase):
         mock_org.assert_called_once_with(
                 f"https://api.github.com/orgs/{org_name}"
             )
+
+    @parameterized.expand([
+        ('google', 'https://api.github.com/orgs/google'),
+    ])
+    def test_public_repos_url(self, org_name, payload):
+        """
+        Unit test for '_public_repos_url' in 'GithubOrgClient'.
+        """
+        with patch.object(
+                GithubOrgClient,
+                'org',
+                new_callable=PropertyMock,
+                return_value={
+                    'repos_url': 'https://api.github.com/orgs/google'
+                    }):
+            client = GithubOrgClient(org_name)
+            result = client._public_repos_url
+            self.assertEqual(result, payload)
