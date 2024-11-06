@@ -63,29 +63,62 @@ class TestGithubOrgClient(unittest.TestCase):
             result = client._public_repos_url
             self.assertEqual(result, payload)
 
-    @parameterized.expand([
-        ('google', {'datas': ['data1', 'data2']}),  # Mock response for google
-        ('abc', {'datas': ['data3', 'data']}),    # Mock response for abc
-    ])
     @patch('client.get_json')
-    def test_public_repos(self, org_name, payload, mock_get_json):
+    def test_public_repos(self, mock_get_json):
         """
         Unit test for 'public_repos' in 'GithubOrgClient'.
         """
-        mock_get_json.return_value = payload
-        url = f'https://api.github.com/orgs/{org_name}'
+
+        payload = {
+            'repos_url': "https://api.github.com/users/google/repos",
+            'repos': [
+                {
+                    "id": 7697149,
+                    "name": "episodes_dart",
+                    "private": False,
+                    "owner": {
+                        "login": "google",
+                        "id": 1342004,
+                    },
+                    "fork": False,
+                    "url": "https://api.github.com/repos/google/episodes.dart",
+                    "created_at": "2013-01-19T00:31:37Z",
+                    "updated_at": "2019-09-23T11:53:58Z",
+                    "has_issues": True,
+                    "forks": 22,
+                    "default_branch": "master",
+                },
+                {
+                    "id": 8566972,
+                    "name": "kratus",
+                    "private": False,
+                    "owner": {
+                        "login": "google",
+                        "id": 1342004,
+                    },
+                    "fork": False,
+                    "url": "https://api.github.com/repos/google/kratu",
+                    "created_at": "2013-03-04T22:52:33Z",
+                    "updated_at": "2019-11-15T22:22:16Z",
+                    "has_issues": True,
+                    "forks": 32,
+                    "default_branch": "master",
+                },
+            ]
+        }
+
+        mock_get_json.return_value = payload['repos']
 
         with patch.object(
                 GithubOrgClient,
-                'public_repos',
-                ) as mock_public_repos:
+                '_public_repos_url',
+                new_callable=PropertyMock
+                ) as mock_public_repos_url:
 
-            mock_public_repos.return_value = url
-            result = client.get_json(url)
-            github_client = GithubOrgClient(org_name)
+            mock_public_repos_url.return_value = payload['repos_url']
+            github_client = GithubOrgClient('google')
             github_client = github_client.public_repos()
 
-            self.assertEqual(github_client, url)
-            self.assertEqual(payload, result)
-            mock_get_json.assert_called_once()
-            mock_public_repos.assert_called_once()
+            self.assertEqual(github_client, ["episodes_dart", "kratus"])
+            mock_public_repos_url.assert_called_once()
+        mock_get_json.assert_called_once()
